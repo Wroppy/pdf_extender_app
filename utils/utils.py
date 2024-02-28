@@ -6,5 +6,5 @@ def to_two_decimals(number: Union[str, int, float]) -> str:
     rounded to 2 decimal places
     """
 
-    return str(round(number, 2))
+    return str(format(number, ".2f"))
     
