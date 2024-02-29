@@ -4,6 +4,9 @@ from PySide6.QtWidgets import *
 
 from header import Header
 from pdf_load_widget import PDFLoadWidget
+from load_page import LoadingPage
+from pdf_viewer import PDFViewer
+
 
 class PDFScalerWidget(QWidget):
     def __init__(self):
@@ -16,14 +19,43 @@ class PDFScalerWidget(QWidget):
         header = Header()
         layout.addWidget(header)
 
+        self.pages = QStackedWidget()
+        layout.addWidget(self.pages)
+
+        # Widget for allowing the user to select a PDF file
         pdf_load_widget = PDFLoadWidget()
-        # pdf_load_widget.file_selected.connect(print)
-        layout.addWidget(pdf_load_widget)
+
+        self.pages.addWidget(pdf_load_widget)
+
+        loading_page = LoadingPage()
+        self.pages.addWidget(loading_page)
+
+        pdf_viewer = PDFViewer()
+        self.pages.addWidget(pdf_viewer)
+
+
+        # When the user selects a PDF file, the window shows the loading page
+        # then loads the pdf
+        pdf_load_widget.file_selected.connect(lambda filename: self.show_loading_page())
+        pdf_load_widget.file_selected.connect(pdf_viewer.load_pdf)
+
+        # When the pdf has been loaded, the user goes to the PDF viewer
+        # Also shows the scaler
+        pdf_viewer.loaded.connect(self.show_pdf_page)
+        pdf_viewer.loaded.connect(lambda: header.set_scaler_visible(True))
+
+    def show_pdf_page(self):
+        self.pages.setCurrentIndex(2)
+
+    def show_load_pdf_page(self):
+        self.pages.setCurrentIndex(0)
+
+    def show_loading_page(self):
+        self.pages.setCurrentIndex(1)
 
     def return_header(self) -> QWidget:
         self.header = QWidget()
         layout = QHBoxLayout(header)
-
 
 
 class PDFScalerWindow(QMainWindow):
