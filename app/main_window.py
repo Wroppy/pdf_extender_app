@@ -17,6 +17,7 @@ class PDFScalerWidget(QWidget):
         layout.addWidget(header)
 
         pdf_load_widget = PDFLoadWidget()
+        # pdf_load_widget.file_selected.connect(print)
         layout.addWidget(pdf_load_widget)
 
     def return_header(self) -> QWidget:

@@ -23,5 +23,5 @@ if __name__ == "__main__":
         print(window.get_filename())
     else:
         print("User cancelled")
-    
+
     app.exec()
