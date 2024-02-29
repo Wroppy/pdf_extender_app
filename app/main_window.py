@@ -16,8 +16,8 @@ class PDFScalerWidget(QWidget):
     def create_widgets(self):
         layout = QVBoxLayout(self)
 
-        header = Header()
-        layout.addWidget(header)
+        self.header = Header()
+        layout.addWidget(self.header)
 
         self.pages = QStackedWidget()
         layout.addWidget(self.pages)
@@ -42,7 +42,7 @@ class PDFScalerWidget(QWidget):
         # When the pdf has been loaded, the user goes to the PDF viewer
         # Also shows the scaler
         pdf_viewer.loaded.connect(self.show_pdf_page)
-        pdf_viewer.loaded.connect(lambda: header.set_scaler_visible(True))
+        pdf_viewer.loaded.connect(lambda: self.header.set_scaler_visible(True))
 
     def show_pdf_page(self):
         self.pages.setCurrentIndex(2)
