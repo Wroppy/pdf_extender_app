@@ -45,12 +45,15 @@ class PDFScalerWidget(QWidget):
         pdf_viewer.loaded.connect(lambda: self.header.set_scaler_visible(True))
 
     def show_pdf_page(self):
+        self.header.set_heading("Preview loaded PDF")
         self.pages.setCurrentIndex(2)
 
     def show_load_pdf_page(self):
+        self.header.set_heading("Pick your file")
         self.pages.setCurrentIndex(0)
 
     def show_loading_page(self):
+        self.header.set_heading("Loading...")
         self.pages.setCurrentIndex(1)
 
     def return_header(self) -> QWidget:

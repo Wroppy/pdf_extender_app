@@ -100,3 +100,6 @@ class Header(QWidget):
             self.set_scaler_visible(False)
             filename = dialog.get_filename()
             self.scale_pdf.emit(scale_factor, filename)
+
+    def set_heading(self, text: str):
+        self.heading.setText(text)
