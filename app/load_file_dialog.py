@@ -8,8 +8,8 @@ class LoadFileDialog(QFileDialog):
         super().__init__()
 
         # User can only select existing pdf files.
-        self.setFileMode(QFileDialog.FileMode.ExistingFile)
-        self.setAcceptMode(QFileDialog.AcceptOpen)
+        self.setFileMode(QFileDialog.FileMode.AnyFile)
+        self.setAcceptMode(QFileDialog.AcceptSave)
         self.setNameFilter("PDF (*.pdf)")
 
     def get_filename(self):
