@@ -10,6 +10,7 @@ from pdf_load_widget import PDFLoadWidget
 from load_page import LoadingPage
 from pdf_viewer import PDFViewer
 from utils import PDFScaler
+from after_scaling_page import AfterScalingPage
 
 
 
@@ -45,6 +46,9 @@ class PDFScalerWidget(QWidget):
         pdf_viewer = PDFViewer()
         self.pages.addWidget(pdf_viewer)
 
+        self.after_scaling_page = AfterScalingPage()
+        self.pages.addWidget(self.after_scaling_page)
+
         # When the user selects a PDF file, the window shows the loading page
         # then loads the pdf
         pdf_load_widget.file_selected.connect(
@@ -73,6 +77,9 @@ class PDFScalerWidget(QWidget):
         self.header.set_heading("Loading...")
         self.pages.setCurrentIndex(1)
 
+    def show_finished_page(self):
+        self.pages.setCurrentIndex(3)
+
     def return_header(self) -> QWidget:
         self.header = QWidget()
         layout = QHBoxLayout(header)
@@ -88,10 +95,17 @@ class PDFScalerWidget(QWidget):
         scaler.write_pdf(desired_path)
 
     def start_scaling(self, scale_factor: float, desired_path: str):
+        # Shows a loading page and scaling
         self.show_loading_page()
         self.scale_pdf(scale_factor / 100, desired_path)
+        self.after_scaling(scale_factor, desired_path)
 
-
+    def after_scaling(self, scale_factor: float, desired_path: str):
+        # Changes the finished page text to the current filename
+        self.header.set_heading("Scale completed")
+        self.after_scaling_page.change_file_text(scale_factor, desired_path)
+        self.show_finished_page()
+    
 class PDFScalerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
