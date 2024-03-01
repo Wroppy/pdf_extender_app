@@ -2,15 +2,16 @@ import sys
 import pathlib
 sys.path.insert(0, f"{pathlib.Path().resolve()}\\")
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-from header import Header
-from pdf_load_widget import PDFLoadWidget
-from load_page import LoadingPage
-from pdf_viewer import PDFViewer
-from utils import PDFScaler
+from pdf_worker import PDFWorker
 from after_scaling_page import AfterScalingPage
+from utils import PDFScaler
+from pdf_viewer import PDFViewer
+from load_page import LoadingPage
+from pdf_load_widget import PDFLoadWidget
+from header import Header
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 
@@ -47,7 +48,8 @@ class PDFScalerWidget(QWidget):
         self.pages.addWidget(pdf_viewer)
 
         self.after_scaling_page = AfterScalingPage()
-        self.after_scaling_page.return_to_start.connect(self.show_load_pdf_page)
+        self.after_scaling_page.return_to_start.connect(
+            self.show_load_pdf_page)
         self.pages.addWidget(self.after_scaling_page)
 
         # When the user selects a PDF file, the window shows the loading page
@@ -65,6 +67,8 @@ class PDFScalerWidget(QWidget):
         pdf_viewer.loaded.connect(lambda: self.header.set_scaler_visible(True))
 
         self.header.scale_pdf.connect(self.start_scaling)
+
+        self.threadpool = QThreadPool()  # Threadpool for multithreading
 
     def show_pdf_page(self):
         self.header.set_heading("Preview loaded PDF")
@@ -98,15 +102,22 @@ class PDFScalerWidget(QWidget):
     def start_scaling(self, scale_factor: float, desired_path: str):
         # Shows a loading page and scaling
         self.show_loading_page()
-        self.scale_pdf(scale_factor / 100, desired_path)
-        self.after_scaling(scale_factor, desired_path)
+
+        # Starts a worker thread to scale the pdf
+        scale_factor /= 100
+        worker = PDFWorker(self.scale_pdf, scale_factor, desired_path)
+        worker.signals.finished.connect(
+            lambda: self.after_scaling(scale_factor, desired_path))
+        self.threadpool.start(worker)
 
     def after_scaling(self, scale_factor: float, desired_path: str):
         # Changes the finished page text to the current filename
         self.header.set_heading("Scale completed")
-        self.after_scaling_page.change_file_text(scale_factor, desired_path)
+        self.after_scaling_page.change_file_text(
+            scale_factor * 100, desired_path)
         self.show_finished_page()
-    
+
+
 class PDFScalerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
