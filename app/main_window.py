@@ -47,6 +47,7 @@ class PDFScalerWidget(QWidget):
         self.pages.addWidget(pdf_viewer)
 
         self.after_scaling_page = AfterScalingPage()
+        self.after_scaling_page.return_to_start.connect(self.show_load_pdf_page)
         self.pages.addWidget(self.after_scaling_page)
 
         # When the user selects a PDF file, the window shows the loading page
